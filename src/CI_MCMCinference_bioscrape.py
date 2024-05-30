@@ -17,24 +17,24 @@ import pandas as pd
 
 # Load model
 #M_loaded_sbml = import_sbml('CI_model_sbml.xml')
-M = Model(sbml_filename = 'CI_model_sbml.xml')
+M = Model(sbml_filename = './models/CI_model_sbml2.xml')
 
-num_trajectories = 15
+num_trajectories = 250
 
 # Import data from CSV
 # Import a CSV file for each experiment run
 exp_data = []
 for i in range(num_trajectories):
-    df = pd.read_csv('CI_trajectories.csv', usecols = ['timepoints', 'X'+str(i), 'Y'+str(i), 'U'+str(i), 'Zx'+str(i), 'Zy'+str(i)])
+    df = pd.read_csv('./data/CI2_trajectories_250.csv', usecols = ['timepoints', 'X'+str(i), 'Y'+str(i), 'U'+str(i), 'Zx'+str(i), 'Zy'+str(i)])
     df.columns = ['timepoints', 'X', 'Y', 'U', 'Zx', 'Zy']
     exp_data.append(df)
 
-prior = {'q1' : ['uniform', 0, 1], 'q2' : ['uniform', 0, 1]}
+prior = {'q1' : ['uniform', 0, 1]}
 
 sampler, pid = py_inference(Model = M, exp_data = exp_data, measurements = ['X', 'Y', 'U', 'Zx', 'Zy'], time_column = ['timepoints'],
-            nwalkers = 15, init_seed = 0.25, nsteps = 2000, sim_type = 'deterministic',
-            params_to_estimate = ['q1', 'q2'], prior = prior)
-pid.plot_mcmc_results(sampler)
+            nwalkers = 25, init_seed = "prior", nsteps = 1200, sim_type = 'stochastic',
+            params_to_estimate = ['q1'], prior = prior)
+report,_ = pid.plot_mcmc_results(sampler)
 
 print('bla')
 

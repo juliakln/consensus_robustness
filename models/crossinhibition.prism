@@ -1,0 +1,57 @@
+ctmc
+
+const int Zx;
+const int Zy;
+const int N;
+
+//const int N_MAX = 100;
+//formula total = x + y + u + Zx + Zy;
+//init total <= N_MAX endinit
+
+module cross_inhibition
+	
+	x : [0..N] init 35;
+	y : [0..N] init 35;
+	u : [0..N] init 0;
+	
+	[cix] 	   (x>0) & (y>0) & (u<N) -> x*y : (x'=x) & (y'=y-1) & (u'=u+1); // x+y -> x+u
+	[ciy] 	   (x>0) & (y>0) & (u<N) -> x*y : (x'=x-1) & (y'=y) & (u'=u+1); // x+y -> y+u
+	[rx] 	   (x>0) & (x<N) & (u>0) -> x*u : (x'=x+1) & (u'=u-1);  	// u+x -> 2x 
+	[ry]       (y>0) & (y<N) & (u>0) -> y*u : (y'=y+1) & (u'=u-1);		// u+y -> 2y
+//	[noise1xa] (x>0) & (u<N) 	 -> x : (x'=x-1) & (u'=u+1);		// x -> u
+//	[noise1xb] (u>0) & (x<N) 	 -> u : (x'=x+1) & (u'=u-1);		// u -> x
+//	[noise1ya] (y>0) & (u<N)	 -> y : (y'=y-1) & (u'=u+1);		// y -> u
+//	[noise1yb] (u>0) & (y<N) 	 -> u : (y'=y+1) & (u'=u-1);		// u -> y
+//	[noise2x]  (y>0) & (x<N) 	 -> y : (x'=x+1) & (y'=y-1);		// y -> x
+//	[noise2y]  (x>0) & (y<N)	 -> x : (x'=x-1) & (y'=y+1);		// x -> y
+	[zeaxa]    (y>0) & (u<N)	 -> y*Zx : (y'=y-1) & (u'=u+1);		// y+Zx -> u+Zx
+	[zeaxb]    (u>0) & (x<N)	 -> u*Zx : (x'=x+1) & (u'=u-1);		// u+Zx -> x+Zx
+	[zeaya]    (x>0) & (u<N)	 -> x*Zy : (x'=x-1) & (u'=u+1);		// x+Zy -> u+Zy
+	[zeayb]    (u>0) & (y<N)	 -> u*Zy : (y'=y+1) & (u'=u-1);		// u+Zy -> y+Zy
+
+endmodule
+
+// base rates
+const double qx = 0.01; 
+const double qy = 0.01; 
+//const double noise = 0;
+
+// module representing the base rates of reactions
+module base_rates
+	
+	[cix] true -> qx : true;
+	[ciy] true -> qy : true;
+	[rx] true -> qx : true;
+	[ry] true -> qy : true;
+//	[noise1xa] true -> noise : true;
+//	[noise1xb] true -> noise : true;
+//	[noise1ya] true -> noise : true;
+//	[noise1yb] true -> noise : true;
+//	[noise2x] true -> noise : true;
+//	[noise2y] true -> noise : true;
+	[zeaxa] true -> qx : true;	
+	[zeaxb] true -> qx : true;
+	[zeaya] true -> qy : true;
+	[zeayb] true -> qy : true;
+
+endmodule

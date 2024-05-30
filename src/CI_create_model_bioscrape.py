@@ -13,7 +13,7 @@ from bioscrape.types import Model
 species = ["X", "Y", "U", "Zx", "Zy"]
 
 # Create a list of parameters
-params = [("q1", .01), ("q2", .01), ("noise", 0.)]  # scaled by N!
+params = [("q1", .04), ("q2", .01), ("noise", 0.)]  # scaled by N!
 
 # Create reaction tuples
 rxn1 = (["X", "Y"], ["X", "U"], "massaction", {"k":"q1"})
@@ -41,8 +41,8 @@ M = Model(species = species, parameters = params ,reactions = rxns, initial_cond
 
 # Simulate Model deterministically
 #timepoints = np.arange(0, 10, 0.01)
-#timepoints = np.arange(0, 60, 0.1)
-timepoints = np.arange(0, 360, 0.5)
+timepoints = np.arange(0, 60, 0.1)
+#timepoints = np.arange(0, 360, 0.5)
 #print(timepoints)
 #results_det = py_simulate_model(timepoints, Model = M)
 
@@ -65,7 +65,7 @@ plt.show(block=True)
 
 
 # Write Model to SBML
-M.write_sbml_model('CI_model_sbml.xml')
+M.write_sbml_model('./models/CI_model_sbml2.xml')
 
 #f = open('CI_model_sbml.xml')
 #print("Bioscrape Model converted to SBML:\n", f.read())
