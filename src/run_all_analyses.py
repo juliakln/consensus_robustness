@@ -30,11 +30,13 @@ property = "../models/consensus.bltl"
 def main():
     ## analysis for stable consensus
 #    analyse_stable_100('z')
-    analyse_stable_500('z')
+    analyse_stable_250('z')
+#    analyse_stable_500('z')
 #    analyse_stable_1000('z')
     
 #    analyse_stable_100('c')
-    analyse_stable_500('c')
+    analyse_stable_250('c')
+#    analyse_stable_500('c')
 #    analyse_stable_1000('c')
 
 #    analyse_stable_100_both()
@@ -43,11 +45,13 @@ def main():
 
     ## analysis for switching consensus
 #    analyse_switch_100('z')
-    analyse_switch_500('z')
+    analyse_switch_250('z')
+#    analyse_switch_500('z')
 #    analyse_switch_1000('z')
 
 #    analyse_switch_100('c')
-    analyse_switch_500('c')
+    analyse_switch_250('c')
+#    analyse_switch_500('c')
 #    analyse_switch_1000('c')
 
 #    analyse_switch_100_both()

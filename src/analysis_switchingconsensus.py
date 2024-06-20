@@ -52,6 +52,29 @@ def analyse_switch_100(stubborn):
     plot_results(stubborn, result, labels, zealots, "Probability of switching consensus", filename)
 
 
+def analyse_switch_250(stubborn):
+
+    N = 250
+    filename = "probs_switchconsensus_" + stubborn + "_" + str(N)
+    zealots = np.linspace(1, 98, 50)
+    samples = 4239
+
+    result = []
+    result.append(switchconsensus(stubborn, N, majority = 50, distance = 25, transient = 35, holding = 40, range = zealots, filename = filename, samples = samples))
+    result.append(switchconsensus(stubborn, N, majority = 35, distance = 25, transient = 35, holding = 40, range = zealots, filename = filename, samples = samples))
+    result.append(switchconsensus(stubborn, N, majority = 65, distance = 25, transient = 35, holding = 40, range = zealots, filename = filename, samples = samples))
+    result.append(switchconsensus(stubborn, N, majority = 50, distance = 2,  transient = 35, holding = 40, range = zealots, filename = filename, samples = samples))
+    result.append(switchconsensus(stubborn, N, majority = 50, distance = 50, transient = 35, holding = 40, range = zealots, filename = filename, samples = samples))
+    result.append(switchconsensus(stubborn, N, majority = 50, distance = 25, transient = 20, holding = 40, range = zealots, filename = filename, samples = samples))
+    result.append(switchconsensus(stubborn, N, majority = 50, distance = 25, transient = 50, holding = 40, range = zealots, filename = filename, samples = samples))
+    result.append(switchconsensus(stubborn, N, majority = 50, distance = 25, transient = 35, holding = 25, range = zealots, filename = filename, samples = samples))
+    result.append(switchconsensus(stubborn, N, majority = 50, distance = 25, transient = 35, holding = 55, range = zealots, filename = filename, samples = samples))
+
+    labels = ['Baseline', 'm=35', 'm=65', 'd=2', 'd=50', 't=20', 't=50', 'h=25', 'h=55']
+
+    plot_results(stubborn, result, labels, zealots, "Probability of switching consensus", filename)
+
+
 def analyse_switch_500(stubborn):
 
     N = 500
