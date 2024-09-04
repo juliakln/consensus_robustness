@@ -1,18 +1,19 @@
 ctmc
 
 // when volume changes, one should change all the parameters so to scale, including the percentage of zealots
-const int N = 100;
-const int Nhalf = 50;
+const int N = 100; // 100
+const int Nhalf = 50; // 50
 
-const int m=50;
-const int d=10;
-const int dHalf=5;
+const int m=50; //50
+const int d=10; //10
+const int dHalf=0;  // =5 for holding time
 
 const int t=35;
 const int h=40;
 
-const int cAll = 18;//number of all contrarians
-const int cHalf = 9;// number of contrarians divided by two 
+
+const int cHalf = 45; // number of contrarians divided by two 
+const int cAll = cHalf*2; //number of all contrarians
 
 const double qx = 1/N;
 const double qy = 1/N;
@@ -74,9 +75,15 @@ module base_rates
         [conyy] true -> qx : true;
 endmodule
 
-rewards
-     ((x+Cx>=m)&(x+Cx>=y+Cy+d)): 1;//count time only if in xwinning states
+//rewards
+//     ((x+Cx>=m)&(x+Cx>=y+Cy+d)): 1;//count time only if in xwinning states
      //!((x+Cx>=m)&(x+Cx>=y+Cy+d)): 1;//count time only if in not in xwinning states
+//endrewards
+
+rewards
+//      (x+Zx>=m)&(x>=y+d): 1;//count time only if in xwinning states
+//	!((x+Zx>=m)&(x>=y+d)): 1;
+	!(((x+Cx>=m)&(x+Cx>=y+Cy+d)) | ((y+Cy>=m)&(y+Cy>=x+Cx+d))) : 1; // expected time to reach majority -> reward if no majority -- now without ! it's a reward for having majority
 endrewards
 
 label "x_wins"=((x+Cx>m)&(x+Cx>=y+Cy+d));

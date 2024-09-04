@@ -8,52 +8,64 @@ import pickle
 #x_values = list(range(101))
 def compute_reaching_time_CI_zealots(z):
     if z==2:
-        return 0
+        return 5.95
     elif z == 4:
-        return 0
+        return 6.12
     elif z == 6:
-        return 0
+        return 6.28
     elif z == 8:
-        return 0
+        return 6.46
     elif z == 10:
-        return 0
+        return 6.65
     elif z == 12:
-        return 0
+        return 6.85
     elif z == 14:
-        return 0
+        return 7.06
     elif z == 16:
-        return 0
+        return 7.28
     elif z == 18:
-        return 0
+        return 7.51
     elif z == 20:
-        return 0
+        return 7.75
     elif z == 22:
-        return 0
+        return 8.0
     elif z == 24:
-        return 0
+        return 8.25
     elif z == 26:
-        return 7771.3
+        return 8.51
     elif z == 28: 
-        return 1831.31
+        return 8.77
     elif z == 30:
-        return 565.99
+        return 9.02
     elif z == 32:
-        return 218.5
+        return 9.27
     elif z == 34:
-        return 109.46
+        return 9.51
     elif z == 36:
-        return 76.36
+        return 9.74
     elif z == 38:
-        return 58.46
+        return 9.95
     elif z == 40:
-        return 47.77
+        return 10.13
+    elif z == 42:
+        return 10.28
+    elif z == 44:
+        return 10.40
     elif z == 50:
-        return 33.48
+        return 10.57
     elif z == 60:
-        return 27.08
+        return 10.48
     elif z == 70:
-        return 0
+        return 12.04
     elif z == 80:
+        return 27.82
+    elif z == 82:
+        return 39.94
+    elif z == 84:
+        return 64.95
+    elif z == 86:
+        return 128.85
+    elif z == 88:
         return 0
     elif z==90:
         return 0

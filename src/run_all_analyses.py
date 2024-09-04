@@ -12,6 +12,7 @@ Results are saved in figures/
 
 import os
 import sys
+import time
 
 from analysis_stableconsensus import *
 from analysis_switchingconsensus import *
@@ -28,36 +29,43 @@ property = "../models/consensus.bltl"
 
 
 def main():
-    ## analysis for stable consensus
-#    analyse_stable_100('z')
-    analyse_stable_250('z')
-#    analyse_stable_500('z')
-#    analyse_stable_1000('z')
+
+    # times = []
+
+    analyse_stable(N=100, stubborn='c')
+    analyse_switch(N=100, stubborn='c')
+
+    # times.extend([analyse_stable(N=100, stubborn='z'), 
+    #              analyse_stable(N=300, stubborn='z'),
+    #              analyse_stable(N=500, stubborn='z'),
+    #              analyse_stable(N=700, stubborn='z'),
+    #              analyse_stable(N=1000, stubborn='z')])
     
-#    analyse_stable_100('c')
-    analyse_stable_250('c')
-#    analyse_stable_500('c')
-#    analyse_stable_1000('c')
+    # print(times)
 
-#    analyse_stable_100_both()
-#    analyse_stable_500_both()
-#    analyse_stable_1000_both()
+    # times.extend([analyse_stable(N=100, stubborn='c'),
+    #               analyse_stable(N=300, stubborn='c'),
+    #               analyse_stable(N=500, stubborn='c'),
+    #               analyse_stable(N=700, stubborn='c'),
+    #               analyse_stable(N=1000, stubborn='c')])
 
-    ## analysis for switching consensus
-#    analyse_switch_100('z')
-    analyse_switch_250('z')
-#    analyse_switch_500('z')
-#    analyse_switch_1000('z')
+    # print(times)
 
-#    analyse_switch_100('c')
-    analyse_switch_250('c')
-#    analyse_switch_500('c')
-#    analyse_switch_1000('c')
+    # times.extend([analyse_switch(N=100, stubborn='z'),  # 1413.57 seconds
+    #               analyse_switch(N=300, stubborn='z'),  # 10436.64 seconds 
+    #               analyse_switch(N=500, stubborn='z'),  # 75047.39 seconds
+    #               analyse_switch(N=700, stubborn='z'),  # 95726.82 seconds 
+    #               analyse_switch(N=1000, stubborn='z')])# 99357.25 seconds
 
-#    analyse_switch_100_both()
-#    analyse_switch_500_both()
-#    analyse_switch_1000_both()
+    # print(times)
 
+    # times.extend([analyse_switch(N=100, stubborn='c'),
+    #               analyse_switch(N=300, stubborn='c'),
+    #               analyse_switch(N=500, stubborn='c'),
+    #               analyse_switch(N=700, stubborn='c'),
+    #               analyse_switch(N=1000, stubborn='c')])
+
+    # print(times)
 
 if __name__ == "__main__":
     sys.exit(main())

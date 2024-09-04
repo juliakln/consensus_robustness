@@ -5,7 +5,15 @@ R=? [ F ("x_wins"|"y_wins") ]
 P=? [ F ("x_wins") ]
 
 // time to leave the state with x majority (we set the initial state to be the state tightly meeting the majority condition)
-R=? [ F (!"x_wins") ]
+R=? [ F !("x_wins") ]
 
-R=? [F(("x_wins"|"y_wins")&((!("y_wins")|(F(!("y_wins"))))&(!("x_wins")|(F(!("x_wins"))))))] 
+R=? [ F (("x_wins"|"y_wins")&((!("y_wins")|(F (!("y_wins"))))&(!("x_wins")|(F (!("x_wins")))))) ]
+
+R=? [ F ("x_wins") U !("x_wins") ]
+
+R=? [ ((x+Cx<m)|(y+Cy<m)|(x+Cx<y+Cy+d)|(y+Cy<x+Cx+d)) ]
+
+R=? [ F ((("x_wins")|("y_wins")) U (F ((!("x_wins"))&(!("y_wins"))))) ]
+
+R=? [ F (("x_wins"|"y_wins")&((!("y_wins")|(F (!("y_wins"))))|(!("x_wins")|(F (!("x_wins")))))) ]
 

@@ -25,8 +25,14 @@ model = "../../models/consensus_model.rml"
 property = "../../models/consensus.bltl"
 
 # define colours and linetypes for plotting
-colours = ['b', 'b', 'b', 'y', 'y', 'r', 'r', 'g', 'g', 'm', 'm', 'c', 'c']
-linetypes = ['-', '--', '--', ':', ':', '--', '--', ':', ':', '--', '--', ':', ':']
+#colours = ['b', 'b', 'b', '#ffaa00', '#ffaa00', 'r', 'r', 'g', 'g', 'm', 'm', 'c', 'c']
+colours = ['b','#ffaa00', '#ffaa00', 'b', 'b', 'g', 'g', 'r', 'r', 'g', 'g', 'm', 'm', 'c', 'c']
+linetypes = ['-', '-', '--', '-', '--', '-', '--', '-', '--', '-', '--', '-']
+
+colours_switch = ['b', 'b', 'b', 'b', 'b', 'r', 'r', 'r', 'r']
+linetypes_switch = ['-', '-', '--', ':', '-.', '-', '--', ':', '-.','-', '--', ':', '-.']
+
+colours_groups = ['k', 'g', 'r', 'b', 'c', 'm', 'y']
 
 
 """
@@ -40,13 +46,15 @@ Write cross-inhibition model with stubborn individuals for Plasmalab
 """
 def write_model(stubborn, N, init):
     # compute remaining number of pure agents
-    X = int(1/2 * (N - 2 * init))
+    #X = int(1/2 * (N - 2 * init))
+    X = int(1/2 * (N - init))
+    Z = int(1/2 * init)
     f = open(model, "w")
     if stubborn == 'z':
         f.write("""ctmc
 
-            const int Zx = """ + str(init) + """;
-            const int Zy = """ + str(init) + """;
+            const int Zx = """ + str(Z) + """;
+            const int Zy = """ + str(Z) + """;
             const int N = """ + str(N) + """;
 
             module cross_inhibition
@@ -87,15 +95,15 @@ def write_model(stubborn, N, init):
         f.write("""ctmc
 
             const int N = """ + str(N) + """;
-            const int cN = """ + str(2*init) + """;
+            const int cN = """ + str(init) + """;
 
             module cross_inhibition
                 
                 x : [0..N] init """ + str(X) + """;
                 y : [0..N] init """ + str(X) + """;
                 u : [0..N] init 0;
-                Cx : [0..N] init """ + str(init) + """;
-                Cy : [0..N] init """ + str(init) + """;
+                Cx : [0..N] init """ + str(Z) + """;
+                Cy : [0..N] init """ + str(Z) + """;
                 
                 [cix] 	   (x>0) & (y>0) & (u<N) -> x*y : (x'=x) & (y'=y-1) & (u'=u+1); // x+y -> x+u
                 [ciy] 	   (x>0) & (y>0) & (u<N) -> x*y : (x'=x-1) & (y'=y) & (u'=u+1); // x+y -> y+u
@@ -223,6 +231,100 @@ def write_model_both(N, zealots, contrarians):
 
 
 
+def write_votermodel(stubborn, N, init):
+    # compute remaining number of pure agents
+    X = int(1/2 * (N - init))
+    Z = int(1/2 * init)
+    f = open(model, "w")
+    if stubborn == 'z':
+        f.write("""ctmc
+
+            const int Zx = """ + str(Z) + """;
+            const int Zy = """ + str(Z) + """;
+            const int N = """ + str(N) + """;
+
+            module cross_inhibition
+                
+                x : [0..N] init """ + str(X) + """;
+                y : [0..N] init """ + str(X) + """;
+                
+                [cix] 	   (x>0) & (y>0) & (y<N) -> x*y : (x'=x-1) & (y'=y+1); // x+y -> y+y
+                [ciy] 	   (x>0) & (y>0) & (x<N) -> x*y : (x'=x+1) & (y'=y-1); // x+y -> x+x
+                [zeaxa]    (y>0) & (x<N)	 -> y*Zx : (y'=y-1) & (x'=x+1);		// y+Zx -> x+Zx
+                [zeaya]    (x>0) & (y<N)	 -> x*Zy : (x'=x-1) & (y'=y+1);		// x+Zy -> y+Zy
+
+            endmodule
+
+            // base rates
+            const double qx = """ + str(1/N) + """; 
+            const double qy = """ + str(1/N) + """; 
+
+            // module representing the base rates of reactions
+            module base_rates
+                
+                [cix] true -> qx : true;
+                [ciy] true -> qy : true;
+                [zeaxa] true -> qx : true;	
+                [zeaya] true -> qy : true;
+
+            endmodule""")
+        # TODO c noch anpassen
+    elif stubborn == 'c':
+        f.write("""ctmc
+
+            const int N = """ + str(N) + """;
+            const int cN = """ + str(init) + """;
+
+            module cross_inhibition
+                
+                x : [0..N] init """ + str(X) + """;
+                y : [0..N] init """ + str(X) + """;
+                u : [0..N] init 0;
+                Cx : [0..N] init """ + str(Z) + """;
+                Cy : [0..N] init """ + str(Z) + """;
+                
+                [cix] 	   (x>0) & (y>0) & (u<N) -> x*y : (x'=x) & (y'=y-1) & (u'=u+1); // x+y -> x+u
+                [ciy] 	   (x>0) & (y>0) & (u<N) -> x*y : (x'=x-1) & (y'=y) & (u'=u+1); // x+y -> y+u
+                [rx] 	   (x>0) & (x<N) & (u>0) -> x*u : (x'=x+1) & (u'=u-1);  	// u+x -> 2x 
+                [ry]       (y>0) & (y<N) & (u>0) -> y*u : (y'=y+1) & (u'=u-1);		// u+y -> 2y
+
+                [conxa]    (x>0) & (Cy>0) & (u<N) -> x*Cy : (x'=x-1) & (u'=u+1);		// x+Cy -> u+Cy
+                [conxb]    (u>0) & (Cy>0) & (y<N) -> u*Cy : (u'=u-1) & (y'=y+1);		// u+Cy -> y+Cy
+                [conxc]    (x>0) & (Cx>0) & (Cy<cN) -> x*Cx : (Cx'=Cx-1) & (Cy'=Cy+1);		// x+Cx -> x+Cy
+                [conya]    (y>0) & (Cx>0) & (u<N) -> y*Cx : (y'=y-1) & (u'=u+1);		// y+Cx -> u+Cx
+                [conyb]    (u>0) & (Cx>0) & (x<N) -> u*Cx : (u'=u-1) & (x'=x+1);		// u+Cx -> x+Cx
+                [conyc]    (y>0) & (Cy>0) & (Cx<cN) -> y*Cy : (Cy'=Cy-1) & (Cx'=Cx+1);		// y+Cy -> y+Cx
+                [conxx]    (Cx>2) & (Cy<(cN-1)) -> (Cx*(Cx-1)/2) : (Cx'=Cx-2) & (Cy'=Cy+2);		// Cx+Cx->Cy+Cy
+                [conyy]    (Cy>2) & (Cx<(cN-1)) -> (Cy*(Cy-1)/2) : (Cy'=Cy-2) & (Cx'=Cx+2);		// Cy+Cy->Cx+Cx
+
+            endmodule
+
+            // base rates
+            const double qx = """ + str(1/N) + """; 
+            const double qy = """ + str(1/N) + """; 
+
+            // module representing the base rates of reactions
+            module base_rates
+                
+                [cix] true -> qx : true;
+                [ciy] true -> qy : true;
+                [rx] true -> qx : true;
+                [ry] true -> qy : true;
+                [conxa] true -> qy : true;
+                [conxb] true -> qy : true;	
+                [conxc] true -> qy : true;
+                [conya] true -> qx : true;
+                [conyb] true -> qx : true;
+                [conyc] true -> qx : true;
+                [conxx] true -> qy : true;
+                [conyy] true -> qx : true;
+
+            endmodule""")
+    else:
+        raise Exception('Type of stubborn individual not supported.')
+    f.close()
+
+
 """
 Write property for reaching stable consensus with stubborn individuals for Plasmalab
     N: total population size
@@ -258,7 +360,7 @@ Write property for switching consensus with stubborn individuals for Plasmalab
 
     Output: BLTL file property
 """
-def write_property_switching(stubborn = 'z', distance = 10, transient = 35, holding = 40):
+def write_property_switching(stubborn = 'z', distance = 10, transient = 35, holding = 10):
     f = open(property, "w")
     if stubborn == 'z':
         f.write("F<="+str(transient)+" (((x+Zx)-(y+Zy)>="+str(distance)+" & (true U<="+str(holding)+" ((y+Zy)-(x+Zx)>="+str(distance)+"))) | ((y+Zy)-(x+Zx)>="+str(distance)+" & (true U<="+str(holding)+" ((x+Zx)-(y+Zy)>="+str(distance)+"))))")
@@ -305,6 +407,24 @@ def stableconsensus(stubborn, N, majority, distance, transient, holding, range, 
 
     return probs
 
+def stableconsensus_voter(stubborn, N, majority, distance, transient, holding, range, filename, samples):
+    dir_con = '../inference_results/' + filename + '_('+str(majority)+','+str(distance)+','+str(transient)+','+str(holding)+')'
+    if not os.path.exists(dir_con):
+        os.makedirs(dir_con)
+    os.chdir(dir_con)
+
+    for s in range:
+        result = "./plasmares_" + str(int(s)) + ".txt"
+        if not os.path.exists(result):
+            write_votermodel(stubborn, N, int(s))
+            write_property_stableconsensus(N, stubborn, majority, distance, transient, holding)
+            pcommand = "sh /Users/juliaklein/Documents/Sonstiges/plasmalab-1.4.5-SNAPSHOT/plasmacli.sh launch -m "+model+":rml -r "+property+":bltl  -a montecarlo -A\"Total samples\"="+str(samples)+" -f proba --progress -o " + result
+            pprocess = subprocess.check_call(pcommand, stdin=None, stdout=None , stderr=None, shell=True)
+
+    probs = read_data(os.getcwd())
+    os.chdir('../')
+
+    return probs
 def switchconsensus(stubborn, N, majority, distance, transient, holding, range, filename, samples):
     dir_con = '../inference_results/' + filename + '_('+str(majority)+','+str(distance)+','+str(transient)+','+str(holding)+')'
     if not os.path.exists(dir_con):
@@ -392,19 +512,26 @@ Plot robustness analysis
 
     Output: lineplot png of probabilities over stubborn individuals for different property settings
 """
-def plot_results(stubborn, results, labels, zealots, ylabel, figname):
+def plot_results(stubborn, results, labels, N, ylabel, figname):
     fig = plt.figure(figsize=(6,6))
     for i in range(1, len(results)):
-        plt.plot(results[i].keys(), results[i].values(), linestyle = linetypes[i], color = colours[i], label = labels[i])
-    plt.plot(results[0].keys(), results[0].values(), 'k', linewidth = 1.5, label = 'Baseline')
-    #plt.xlim(0, 2*int(zealots[-1]))
-    # get every 3rd element for labels
-    zealots_labels = zealots[3 - 1::3]
-    plt.xticks(zealots_labels, np.multiply(zealots_labels, 2).astype(int), rotation='horizontal')
+#        perc = np.linspace(0,70,len(results[i].keys()))
+        p1 = [100 * value / N for value in results[i].keys()]
+        plt.plot(p1, results[i].values(), linestyle = linetypes[i], color = colours[i], label = labels[i])
+    #perc = np.linspace(0,70,len(results[0].keys()))
+    p1 = [100 * value / N for value in results[0].keys()]
+    plt.plot(p1, results[0].values(), 'k', linewidth = 1.5, label = 'Baseline')
+    #calc_labels = (percentages % 10 == 0)
+    #zealots_labels, unique_indices = np.unique(percentages[calc_labels], return_index=True)
+    #p_indices = np.where(calc_labels)[0][unique_indices]
+    #zealots_ticks = np.array(list(results[0].keys()))[p_indices]
+    #zealots_labels = percentages[calc_labels]
+    #plt.xticks(zealots_ticks, zealots_labels, rotation='horizontal')
     if stubborn == 'z':
-        plt.xlabel('Amount of Zealots Z = Zx + Zy')
+#        plt.xlabel('Percentage of Zealots Z = Zx + Zy')
+        plt.xlabel('Amount of zealots as % of the total group')
     elif stubborn == 'c':
-        plt.xlabel('Amount of Contrarians C = Cx + Cy')
+        plt.xlabel('Amount of contrarians as % of the total group')
     else:
         raise Exception('Type of stubborn individual not supported.')
     plt.ylabel(ylabel)
@@ -412,6 +539,28 @@ def plot_results(stubborn, results, labels, zealots, ylabel, figname):
     fig.savefig('../figures/' + figname + '.png')
     plt.close()   
 
+
+
+def plot_results_switch(stubborn, results, labels, N, ylabel, figname):
+    fig = plt.figure(figsize=(6,6))
+    for i in range(1, len(results)):
+#        perc = np.linspace(0,70,len(results[i].keys()))
+        p1 = [100 * value / N for value in results[i].keys()]
+        plt.plot(p1, results[i].values(), linestyle = linetypes_switch[i], color = colours_switch[i], label = labels[i])
+    #perc = np.linspace(0,70,len(results[0].keys()))
+    p1 = [100 * value / N for value in results[0].keys()]
+    plt.plot(p1, results[0].values(), 'k', linewidth = 1.5, label = 'Baseline')
+    if stubborn == 'z':
+#        plt.xlabel('Percentage of Zealots Z = Zx + Zy')
+        plt.xlabel('Amount of zealots as % of the total group')
+    elif stubborn == 'c':
+        plt.xlabel('Amount of contrarians as % of the total group')
+    else:
+        raise Exception('Type of stubborn individual not supported.')
+    plt.ylabel(ylabel)
+    plt.legend()
+    fig.savefig('../figures/' + figname + '.png')
+    plt.close()   
 
 """ 
 Plot 2dim robustness analysis for model with both zealots & contrarians
@@ -437,6 +586,39 @@ def plot_results_2dim(results, range_z, range_c, figname):
     fig.savefig('../figures/' + figname + '.png')
     plt.close()
 
+"""
+Plot robustness analysis
+    stubborn: z (zealots), c (contrarians)
+    results: dictionaries of probabilities for different consensus settings
+    labels: specification of settings for plotting labels
+    zealots: list of zealots for which we computed the probabilities
+    ylabel: What to write on y axis
+    figname: how to name file
+
+    Output: lineplot png of probabilities over stubborn individuals for different property settings
+"""
+def plot_results_groups(stubborn, results, labels, percentages, ylabel, figname):
+    fig = plt.figure(figsize=(6,6))
+    for i in range(0, len(results)):
+        plt.plot(results[i].keys(), results[i].values(), color = colours_groups[i], label = labels[i])
+
+    calc_labels = (percentages % 10 == 0)
+    zealots_labels, unique_indices = np.unique(percentages[calc_labels], return_index=True)
+    p_indices = np.where(calc_labels)[0][unique_indices]
+    zealots_ticks = np.array(list(results[-1].keys()))[p_indices]
+    #zealots_labels = percentages[calc_labels]
+    plt.xticks(zealots_ticks, zealots_labels, rotation='horizontal')
+    if stubborn == 'z':
+#        plt.xlabel('Percentage of Zealots Z = Zx + Zy')
+        plt.xlabel('Proportion of Zealots as % of the total group')
+    elif stubborn == 'c':
+        plt.xlabel('Proportion of Contrarians as % of the total group')
+    else:
+        raise Exception('Type of stubborn individual not supported.')
+    plt.ylabel(ylabel)
+    plt.legend()
+    fig.savefig('../figures/' + figname + '.png')
+    plt.close()   
 
 
 """
