@@ -148,6 +148,109 @@ def write_model(stubborn, N, init):
 
 
 
+
+def write_ci_asym(stubborn, N, init):
+    # compute remaining number of pure agents
+    X = int(1/2 * (N - init))
+    Z = int(1/2 * init)
+    f = open(model, "w")
+    if stubborn == 'z':
+        f.write("""ctmc
+
+            const int Zx = """ + str(Z) + """;
+            const int Zy = """ + str(Z) + """;
+            const int N = """ + str(N) + """;
+
+            module cross_inhibition
+                
+                x : [0..N] init """ + str(X) + """;
+                y : [0..N] init """ + str(X) + """;
+                u : [0..N] init 0;
+                
+                [cix] 	   (x>0) & (y>0) & (u<N) -> x*y : (x'=x) & (y'=y-1) & (u'=u+1); // x+y -> x+u
+                [ciy] 	   (x>0) & (y>0) & (u<N) -> x*y : (x'=x-1) & (y'=y) & (u'=u+1); // x+y -> y+u
+                [rx] 	   (x>0) & (x<N) & (u>0) -> x*u : (x'=x+1) & (u'=u-1);  	// u+x -> 2x 
+                [ry]       (y>0) & (y<N) & (u>0) -> y*u : (y'=y+1) & (u'=u-1);		// u+y -> 2y
+                [zeaxa]    (y>0) & (u<N) & (Zx>0) -> y*Zx : (y'=y-1) & (u'=u+1);		// y+Zx -> u+Zx
+                [zeaxb]    (u>0) & (x<N) & (Zx>0) -> u*Zx : (x'=x+1) & (u'=u-1);		// u+Zx -> x+Zx
+                [zeaya]    (x>0) & (u<N) & (Zy>0) -> x*Zy : (x'=x-1) & (u'=u+1);		// x+Zy -> u+Zy
+                [zeayb]    (u>0) & (y<N) & (Zy>0) -> u*Zy : (y'=y+1) & (u'=u-1);		// u+Zy -> y+Zy
+
+            endmodule
+
+            // base rates
+            const double qx = """ + str(1/N) + """; 
+            const double qy = """ + str(1/N) + """; 
+
+            // module representing the base rates of reactions
+            module base_rates
+                
+                [cix] true -> qx : true;
+                [ciy] true -> qy : true;
+                [rx] true -> qx : true;
+                [ry] true -> qy : true;
+                [zeaxa] true -> qx : true;	
+                [zeaxb] true -> qx : true;
+                [zeaya] true -> qy : true;
+                [zeayb] true -> qy : true;
+
+            endmodule""")
+    elif stubborn == 'c':
+        f.write("""ctmc
+
+            const int N = """ + str(N) + """;
+            const int cN = """ + str(init) + """;
+
+            module cross_inhibition
+                
+                x : [0..N] init """ + str(X) + """;
+                y : [0..N] init """ + str(X) + """;
+                u : [0..N] init 0;
+                Cx : [0..N] init """ + str(Z) + """;
+                Cy : [0..N] init """ + str(Z) + """;
+                
+                [cix] 	   (x>0) & (y>0) & (u<N) -> x*y : (x'=x) & (y'=y-1) & (u'=u+1); // x+y -> x+u
+                [ciy] 	   (x>0) & (y>0) & (u<N) -> x*y : (x'=x-1) & (y'=y) & (u'=u+1); // x+y -> y+u
+                [rx] 	   (x>0) & (x<N) & (u>0) -> x*u : (x'=x+1) & (u'=u-1);  	// u+x -> 2x 
+                [ry]       (y>0) & (y<N) & (u>0) -> y*u : (y'=y+1) & (u'=u-1);		// u+y -> 2y
+
+                [conxa]    (x>0) & (Cy>0) & (u<N) -> x*Cy : (x'=x-1) & (u'=u+1);		// x+Cy -> u+Cy
+                [conxb]    (u>0) & (Cy>0) & (y<N) -> u*Cy : (u'=u-1) & (y'=y+1);		// u+Cy -> y+Cy
+                [conxc]    (x>0) & (Cx>0) & (Cy<N) -> x*Cx : (Cx'=Cx-1) & (Cy'=Cy+1);		// x+Cx -> x+Cy
+                [conya]    (y>0) & (Cx>0) & (u<N) -> y*Cx : (y'=y-1) & (u'=u+1);		// y+Cx -> u+Cx
+                [conyb]    (u>0) & (Cx>0) & (x<N) -> u*Cx : (u'=u-1) & (x'=x+1);		// u+Cx -> x+Cx
+                [conyc]    (y>0) & (Cy>0) & (Cx<N) -> y*Cy : (Cy'=Cy-1) & (Cx'=Cx+1);		// y+Cy -> y+Cx
+                [conxx]    (Cx>2) & (Cy<(N-1)) -> (Cx*(Cx-1)/2) : (Cx'=Cx-2) & (Cy'=Cy+2);		// Cx+Cx->Cy+Cy
+                [conyy]    (Cy>2) & (Cx<(N-1)) -> (Cy*(Cy-1)/2) : (Cy'=Cy-2) & (Cx'=Cx+2);		// Cy+Cy->Cx+Cx
+
+            endmodule
+
+            // base rates
+            const double qx = """ + str(1/N) + """; 
+            const double qy = """ + str(1/N) + """; 
+
+            // module representing the base rates of reactions
+            module base_rates
+                
+                [cix] true -> qx : true;
+                [ciy] true -> qy : true;
+                [rx] true -> qx : true;
+                [ry] true -> qy : true;
+                [conxa] true -> qy : true;
+                [conxb] true -> qy : true;	
+                [conxc] true -> qx : true;
+                [conya] true -> qx : true;
+                [conyb] true -> qx : true;
+                [conyc] true -> qy : true;
+                [conxx] true -> qx : true;
+                [conyy] true -> qy : true;
+
+            endmodule""")
+    else:
+        raise Exception('Type of stubborn individual not supported.')
+    f.close()
+
+
 """
 Write cross-inhibition model with zealots & contrarians for Plasmalab
     N: total population size
@@ -325,6 +428,96 @@ def write_votermodel(stubborn, N, init):
     f.close()
 
 
+
+
+
+def write_votermodel_asym(stubborn, N, init):
+    # compute remaining number of pure agents
+    X = int(1/2 * (N - init))
+    Z = int(1/2 * init)
+    f = open(model, "w")
+    if stubborn == 'z':
+        f.write("""ctmc
+
+            const int Zx = """ + str(Z) + """;
+            const int Zy = """ + str(Z) + """;
+            const int N = """ + str(N) + """;
+
+            module cross_inhibition
+                
+                x : [0..N] init """ + str(X) + """;
+                y : [0..N] init """ + str(X) + """;
+                
+                [cix] 	   (x>0) & (y>0) & (x<N)  -> x*y : (x'=x+1) & (y'=y-1);  // x+y -> x+x
+                [ciy] 	   (x>0) & (y>0) & (y<N)  -> x*y : (x'=x-1) & (y'=y+1);  // x+y -> y+y
+                [zeaxa]    (y>0) & (x<N) & (Zx>0) -> y*Zx : (y'=y-1) & (x'=x+1); // y+Zx -> x+Zx
+                [zeaya]    (x>0) & (y<N) & (Zy>0) -> x*Zy : (x'=x-1) & (y'=y+1); // x+Zy -> y+Zy
+
+            endmodule
+
+            // base rates
+            const double qx = """ + str(1/N) + """; 
+            const double qy = """ + str(1/N) + """; 
+
+            // module representing the base rates of reactions
+            module base_rates
+                
+                [cix] true -> qx : true;
+                [ciy] true -> qy : true;
+                [zeaxa] true -> qx : true;	
+                [zeaya] true -> qy : true;
+
+            endmodule""")
+        # TODO c noch anpassen
+    elif stubborn == 'c':
+        f.write("""ctmc
+
+            const int N = """ + str(N) + """;
+            const int cN = """ + str(init) + """;
+
+            module cross_inhibition
+                
+                x : [0..N] init """ + str(X) + """;
+                y : [0..N] init """ + str(X) + """;
+                u : [0..N] init 0;
+                Cx : [0..N] init """ + str(Z) + """;
+                Cy : [0..N] init """ + str(Z) + """;
+                
+                [cix] 	   (x>0) & (y>0) & (x<N)  -> x*y : (x'=x+1) & (y'=y-1);  // x+y -> x+x
+                [ciy] 	   (x>0) & (y>0) & (y<N)  -> x*y : (x'=x-1) & (y'=y+1);  // x+y -> y+y
+
+                [conxa]    (x>0) & (Cy>0) & (y<N) -> x*Cy : (x'=x-1) & (y'=y+1);		    // x+Cy -> y+Cy
+                [conxc]    (x>0) & (Cx>0) & (Cy<N) -> x*Cx : (Cx'=Cx-1) & (Cy'=Cy+1);	    // x+Cx -> x+Cy
+                [conya]    (y>0) & (Cx>0) & (x<N) -> y*Cx : (y'=y-1) & (x'=x+1);		    // y+Cx -> x+Cx
+                [conyc]    (y>0) & (Cy>0) & (Cx<N) -> y*Cy : (Cy'=Cy-1) & (Cx'=Cx+1);	    // y+Cy -> y+Cx
+                [conxx]    (Cx>1) & (Cy<(N-1)) -> (Cx*(Cx-1)/2) : (Cx'=Cx-2) & (Cy'=Cy+2); // Cx+Cx->Cy+Cy
+                [conyy]    (Cy>1) & (Cx<(N-1)) -> (Cy*(Cy-1)/2) : (Cy'=Cy-2) & (Cx'=Cx+2);	// Cy+Cy->Cx+Cx
+
+            endmodule
+
+            // base rates
+            const double qx = """ + str(1/N) + """; 
+            const double qy = """ + str(1/N) + """; 
+
+            // module representing the base rates of reactions
+            module base_rates
+                
+                [cix] true -> qx : true;
+                [ciy] true -> qy : true;
+                [conxa] true -> qy : true;
+                [conxc] true -> qx : true;
+                [conya] true -> qx : true;
+                [conyc] true -> qy : true;
+                [conxx] true -> qx : true;
+                [conyy] true -> qy : true;
+
+            endmodule""")
+    else:
+        raise Exception('Type of stubborn individual not supported.')
+    f.close()
+
+
+
 """
 Write property for reaching stable consensus with stubborn individuals for Plasmalab
     N: total population size
@@ -346,6 +539,35 @@ def write_property_stableconsensus(N = 100, stubborn = 'z', majority = 50, dista
         f.write("F<="+str(transient)+" (G<="+str(holding)+" (((x+Cx>="+str(threshold)+") & ((x+Cx)-(y+Cy)>="+str(distance)+")) | ((y+Cy>="+str(threshold) + ") & ((y+Cy)-(x+Cx)>="+str(distance)+"))))")
     elif stubborn == 'b':
         f.write("F<="+str(transient)+" (G<="+str(holding)+" (((x+Cx+Zx>="+str(threshold)+") & ((x+Cx+Zx)-(y+Cy+Zy)>="+str(distance)+")) | ((y+Cy+Zy>="+str(threshold) + ") & ((y+Cy+Zy)-(x+Cx+Zx)>="+str(distance)+"))))")
+    else:
+        raise Exception('Type of stubborn individual not supported.')
+    f.close()
+
+
+def write_property_stableconsensus_asym_x(N = 100, stubborn = 'z', majority = 50, distance = 10, transient = 35, holding = 40):
+    # compute absolute number to reach majority
+    threshold = int((majority / 100) * N)
+    f = open(property, "w")
+    if stubborn == 'z':
+        f.write("F<="+str(transient)+" (G<="+str(holding)+" (((x+Zx>="+str(threshold)+") & (x-y>="+str(distance)+"))))")
+    elif stubborn == 'c':
+        f.write("F<="+str(transient)+" (G<="+str(holding)+" (((x+Cx>="+str(threshold)+") & ((x+Cx)-(y+Cy)>="+str(distance)+"))))")
+    elif stubborn == 'b':
+        f.write("F<="+str(transient)+" (G<="+str(holding)+" (((x+Cx+Zx>="+str(threshold)+") & ((x+Cx+Zx)-(y+Cy+Zy)>="+str(distance)+"))))")
+    else:
+        raise Exception('Type of stubborn individual not supported.')
+    f.close()
+
+def write_property_stableconsensus_asym_y(N = 100, stubborn = 'z', majority = 50, distance = 10, transient = 35, holding = 40):
+    # compute absolute number to reach majority
+    threshold = int((majority / 100) * N)
+    f = open(property, "w")
+    if stubborn == 'z':
+        f.write("F<="+str(transient)+" (G<="+str(holding)+" (((y+Zy>="+str(threshold)+") & ((y+Zy)-(x+Zx)>="+str(distance)+"))))")
+    elif stubborn == 'c':
+        f.write("F<="+str(transient)+" (G<="+str(holding)+" (((y+Cy>="+str(threshold)+") & ((y+Cy)-(x+Cx)>="+str(distance)+"))))")
+    elif stubborn == 'b':
+        f.write("F<="+str(transient)+" (G<="+str(holding)+" (((y+Cy+Zy>="+str(threshold)+") & ((y+Cy+Zy)-(x+Cx+Zx)>="+str(distance)+"))))")
     else:
         raise Exception('Type of stubborn individual not supported.')
     f.close()
@@ -425,6 +647,91 @@ def stableconsensus_voter(stubborn, N, majority, distance, transient, holding, r
     os.chdir('../')
 
     return probs
+
+def stableconsensus_voter_asym_x(stubborn, N, majority, distance, transient, holding, range, filename, samples):
+    dir_con = '../inference_results/' + filename + '_x_('+str(majority)+','+str(distance)+','+str(transient)+','+str(holding)+')'
+    if not os.path.exists(dir_con):
+        os.makedirs(dir_con)
+    os.chdir(dir_con)
+
+    for s in range:
+        result = "./plasmares_" + str(int(s)) + ".txt"
+        if not os.path.exists(result):
+            write_votermodel_asym(stubborn, N, int(s))
+            write_property_stableconsensus_asym_x(N, stubborn, majority, distance, transient, holding)
+            pcommand = "sh /Users/juliaklein/Documents/Sonstiges/plasmalab-1.4.5-SNAPSHOT/plasmacli.sh launch -m "+model+":rml -r "+property+":bltl  -a montecarlo -A\"Total samples\"="+str(samples)+" -f proba --progress -o " + result
+            pprocess = subprocess.check_call(pcommand, stdin=None, stdout=None , stderr=None, shell=True)
+
+    probs = read_data(os.getcwd())
+    os.chdir('../')
+
+    return probs
+
+
+def stableconsensus_voter_asym_y(stubborn, N, majority, distance, transient, holding, range, filename, samples):
+    dir_con = '../inference_results/' + filename + '_y_('+str(majority)+','+str(distance)+','+str(transient)+','+str(holding)+')'
+    if not os.path.exists(dir_con):
+        os.makedirs(dir_con)
+    os.chdir(dir_con)
+
+    for s in range:
+        result = "./plasmares_" + str(int(s)) + ".txt"
+        if not os.path.exists(result):
+            write_votermodel_asym(stubborn, N, int(s))
+            write_property_stableconsensus_asym_y(N, stubborn, majority, distance, transient, holding)
+            pcommand = "sh /Users/juliaklein/Documents/Sonstiges/plasmalab-1.4.5-SNAPSHOT/plasmacli.sh launch -m "+model+":rml -r "+property+":bltl  -a montecarlo -A\"Total samples\"="+str(samples)+" -f proba --progress -o " + result
+            pprocess = subprocess.check_call(pcommand, stdin=None, stdout=None , stderr=None, shell=True)
+
+    probs = read_data(os.getcwd())
+    os.chdir('../')
+
+    return probs
+
+
+
+def stableconsensus_ci_asym_x(stubborn, N, majority, distance, transient, holding, range, filename, samples):
+    dir_con = '../inference_results/' + filename + '_x_('+str(majority)+','+str(distance)+','+str(transient)+','+str(holding)+')'
+    if not os.path.exists(dir_con):
+        os.makedirs(dir_con)
+    os.chdir(dir_con)
+
+    for s in range:
+        result = "./plasmares_" + str(int(s)) + ".txt"
+        if not os.path.exists(result):
+            write_ci_asym(stubborn, N, int(s))
+            write_property_stableconsensus_asym_x(N, stubborn, majority, distance, transient, holding)
+            pcommand = "sh /Users/juliaklein/Documents/Sonstiges/plasmalab-1.4.5-SNAPSHOT/plasmacli.sh launch -m "+model+":rml -r "+property+":bltl  -a montecarlo -A\"Total samples\"="+str(samples)+" -f proba --progress -o " + result
+            pprocess = subprocess.check_call(pcommand, stdin=None, stdout=None , stderr=None, shell=True)
+
+    probs = read_data(os.getcwd())
+    os.chdir('../')
+
+    return probs
+
+
+def stableconsensus_ci_asym_y(stubborn, N, majority, distance, transient, holding, range, filename, samples):
+    dir_con = '../inference_results/' + filename + '_y_('+str(majority)+','+str(distance)+','+str(transient)+','+str(holding)+')'
+    if not os.path.exists(dir_con):
+        os.makedirs(dir_con)
+    os.chdir(dir_con)
+
+    for s in range:
+        result = "./plasmares_" + str(int(s)) + ".txt"
+        if not os.path.exists(result):
+            write_ci_asym(stubborn, N, int(s))
+            write_property_stableconsensus_asym_y(N, stubborn, majority, distance, transient, holding)
+            pcommand = "sh /Users/juliaklein/Documents/Sonstiges/plasmalab-1.4.5-SNAPSHOT/plasmacli.sh launch -m "+model+":rml -r "+property+":bltl  -a montecarlo -A\"Total samples\"="+str(samples)+" -f proba --progress -o " + result
+            pprocess = subprocess.check_call(pcommand, stdin=None, stdout=None , stderr=None, shell=True)
+
+    probs = read_data(os.getcwd())
+    os.chdir('../')
+
+    return probs
+
+
+
+
+
 def switchconsensus(stubborn, N, majority, distance, transient, holding, range, filename, samples):
     dir_con = '../inference_results/' + filename + '_('+str(majority)+','+str(distance)+','+str(transient)+','+str(holding)+')'
     if not os.path.exists(dir_con):

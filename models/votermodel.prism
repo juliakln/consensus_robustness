@@ -1,7 +1,7 @@
 ctmc
 
-//const int Zx;
-//const int Zy;
+const int Zx;
+const int Zy;
 const int N;
 
 
@@ -13,14 +13,14 @@ module voter
 	[cix] 	   (x>0) & (y>0) -> x*y : (x'=x+1) & (y'=y-1); // x+y -> x+x
 	[ciy] 	   (x>0) & (y>0) -> x*y : (x'=x-1) & (y'=y+1); // x+y -> y+y
 
-//	[zeaxa]    (y>0) & (x<N) -> y*Zx : (y'=y-1) & (x'=x+1);	// y+Zx -> x+Zx
-//	[zeaya]    (x>0) & (y<N) -> x*Zy : (x'=x-1) & (y'=y+1);	// x+Zy -> y+Zy
+	[zeaxa]    (y>0) & (x<N) & (Zx>0) -> y*Zx : (y'=y-1) & (x'=x+1);	// y+Zx -> x+Zx
+	[zeaya]    (x>0) & (y<N) & (Zy>0) -> x*Zy : (x'=x-1) & (y'=y+1);	// x+Zy -> y+Zy
 
 endmodule
 
 // base rates
-const double qx = 0.01; 
-const double qy = 0.01; 
+const double qx = 0.011; 
+const double qy = 0.009; 
 //const double noise = 0;
 
 // module representing the base rates of reactions
@@ -29,7 +29,7 @@ module base_rates
 	[cix] true -> qx : true;
 	[ciy] true -> qy : true;
 
-//	[zeaxa] true -> qx : true;	
-//	[zeaya] true -> qy : true;
+	[zeaxa] true -> qx : true;	
+	[zeaya] true -> qy : true;
 
 endmodule

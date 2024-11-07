@@ -1,16 +1,16 @@
 ctmc
 
 // when volume changes, one should change all the parameters so to scale, including the percentage of zealots
-const int N = 100;
-const int Nhalf = 50;
+const int N = 1000;
+const int Nhalf = 500;
 
-const int m=50;
-const int d=10;
+const int m=500;
+const int d=100;
 const int t=35;
 const int h=40;
 
-const int Zx = 15;
-const int Zy = 15;
+const int Zx = 140;
+const int Zy = 140;
 
 const double qx = 1/N;
 const double qy = 1/N;
@@ -50,7 +50,7 @@ endmodule
 rewards
 //      (x+Zx>=m)&(x>=y+d): 1;//count time only if in xwinning states
 //	!((x+Zx>=m)&(x>=y+d)): 1;
-	!(((x+Zx>=m)&(x>=y+d)) | ((y+Zy>=m)&(y>=x+d))) : 1; // expected time to reach majority -> reward if no majority 
+	(((x+Zx>=m)&(x>=y+d)) | ((y+Zy>=m)&(y>=x+d))) : 1; // expected time to reach majority -> reward if no majority 
 endrewards
 
 label "x_wins"=((x+Zx>m)&(x>=y+d));
