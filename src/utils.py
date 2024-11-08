@@ -179,8 +179,8 @@ def write_ci_asym(stubborn, N, init):
             endmodule
 
             // base rates
-            const double qx = """ + str(1/N) + """; 
-            const double qy = """ + str(1/N) + """; 
+            const double qx = """ + str(1.05/N) + """; 
+            const double qy = """ + str(0.95/N) + """; 
 
             // module representing the base rates of reactions
             module base_rates
@@ -226,8 +226,8 @@ def write_ci_asym(stubborn, N, init):
             endmodule
 
             // base rates
-            const double qx = """ + str(1/N) + """; 
-            const double qy = """ + str(1/N) + """; 
+            const double qx = """ + str(1.05/N) + """; 
+            const double qy = """ + str(0.95/N) + """; 
 
             // module representing the base rates of reactions
             module base_rates
@@ -456,8 +456,8 @@ def write_votermodel_asym(stubborn, N, init):
             endmodule
 
             // base rates
-            const double qx = """ + str(1/N) + """; 
-            const double qy = """ + str(1/N) + """; 
+            const double qx = """ + str(1.05/N) + """; 
+            const double qy = """ + str(0.95/N) + """; 
 
             // module representing the base rates of reactions
             module base_rates
@@ -496,8 +496,8 @@ def write_votermodel_asym(stubborn, N, init):
             endmodule
 
             // base rates
-            const double qx = """ + str(1/N) + """; 
-            const double qy = """ + str(1/N) + """; 
+            const double qx = """ + str(1.05/N) + """; 
+            const double qy = """ + str(0.95/N) + """; 
 
             // module representing the base rates of reactions
             module base_rates

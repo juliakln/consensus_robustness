@@ -500,10 +500,13 @@ def analyse_stable_phasetransition(N = 10000, stubborn = 'z'):
 
 
 def main():
-    case = 'symm'
-    analyse_voter(N=100, stubborn='c', case=case)
-    analyse_ci(N=100, stubborn='c', case=case)
-
+    case = 'medium'
+    analyse_voter(N=50, stubborn='z', case=case)
+    analyse_ci(N=50, stubborn='z', case=case)
+    analyse_voter(N=50, stubborn='c', case=case)
+    analyse_ci(N=50, stubborn='c', case=case)
+    analyse_voter(N=1000, stubborn='c', case=case)
+    analyse_ci(N=1000, stubborn='c', case=case)
 
 if __name__ == "__main__":
     sys.exit(main())
