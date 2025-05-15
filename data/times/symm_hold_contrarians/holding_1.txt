@@ -1,0 +1,3 @@
+Result
+Error: Iterative method did not converge within 1000000 iterations.
+Consider using a different numerical method or increasing the maximum number of iterations.

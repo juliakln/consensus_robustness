@@ -12,11 +12,11 @@ const int t=35;
 const int h=40;
 
 
-const int cHalf = 45; // number of contrarians divided by two 
+const int cHalf = 1; // number of contrarians divided by two 
 const int cAll = cHalf*2; //number of all contrarians
 
-const double qx = 1/N;
-const double qy = 1/N;
+const double qx = 1.05/N;
+const double qy = 0.95/N;
 
 module cross_inhibition
 	x : [0..N] init Nhalf-cHalf+dHalf;//x : [0..N] init Nhalf-cHalf;
@@ -39,16 +39,6 @@ module cross_inhibition
         [conxx]    (Cx>2) & (Cy<(cAll-1)) -> (Cx*(Cx-1)/2) : (Cx'=Cx-2) & (Cy'=Cy+2);	// Cx+Cx->Cy+Cy
         [conyy]    (Cy>2) & (Cx<(cAll-1)) -> (Cy*(Cy-1)/2) : (Cy'=Cy-2) & (Cx'=Cx+2);	// Cy+Cy->Cx+Cx
 
-// 1. I also changed that the total number of contrarians is constant, that is only CX agents can convert to become CY
-// agents and vice versa, but CX never becomes X or Y pure
-// 2. I CHANGED THE RATE FROM Cx*Cx to Cx*(Cx-1)/2 to account for the combinations of choosing two out of Cx 
-//copies of contrarians with opinion x - these are only (Cx choose 2)!!!
-// 3.conya was wrong rate (was 'x*Cx, correct is y*Cx')
-
-	//[zeaxa]    (y>0) & (u<N)	 -> y*Zx : (y'=y-1) & (u'=u+1);		// y+Zx -> u+Zx
-	//[zeaxb]    (u>0) & (x<N)	 -> u*Zx : (x'=x+1) & (u'=u-1);		// u+Zx -> x+Zx
-	//[zeaya]    (x>0) & (u<N)	 -> x*Zy : (x'=x-1) & (u'=u+1);		// x+Zy -> u+Zy
-	//[zeayb]    (u>0) & (y<N)	 -> u*Zy : (y'=y+1) & (u'=u-1);		// u+Zy -> y+Zy
 
 endmodule
 
@@ -60,31 +50,26 @@ module base_rates
 	[rx] true -> qx : true;
 	[ry] true -> qy : true;
 
-	//[zeaxa] true -> qx : true;	
-	//[zeaxb] true -> qx : true;
-	//[zeaya] true -> qy : true;
-	//[zeayb] true -> qy : true;
-
         [conxa] true -> qy : true;
         [conxb] true -> qy : true;	
-        [conxc] true -> qy : true;
+        [conxc] true -> qx : true;
         [conya] true -> qx : true;
         [conyb] true -> qx : true;
-        [conyc] true -> qx : true;
-        [conxx] true -> qy : true;
-        [conyy] true -> qx : true;
+        [conyc] true -> qy : true;
+        [conxx] true -> qx : true;
+        [conyy] true -> qy : true;
 endmodule
 
-//rewards
-//     ((x+Cx>=m)&(x+Cx>=y+Cy+d)): 1;//count time only if in xwinning states
-     //!((x+Cx>=m)&(x+Cx>=y+Cy+d)): 1;//count time only if in not in xwinning states
-//endrewards
 
 rewards
-//      (x+Zx>=m)&(x>=y+d): 1;//count time only if in xwinning states
+	//((x+Zx>=m)&(x>=y+d)) : 1; // expected time to reach majority -> reward if no majority 
+//	!((y+Zy>=m)&(y>=x+d)) : 1; // expected time to reach majority -> reward if no majority 
+//	!(((x+Zx>=m)&(x>=y+d)) | ((y+Zy>=m)&(y>=x+d))) : 1;
+
+        (x+Cx>=m)&(x+Cx>=Cy+y+d): 1;//count time only if in xwinning states
 //	!((x+Zx>=m)&(x>=y+d)): 1;
-	!(((x+Cx>=m)&(x+Cx>=y+Cy+d)) | ((y+Cy>=m)&(y+Cy>=x+Cx+d))) : 1; // expected time to reach majority -> reward if no majority -- now without ! it's a reward for having majority
+	//(((x+Cx>=m)&(x+Cx>=y+Cy+d)) | ((y+Cy>=m)&(y+Cy>=x+Cx+d))) : 1; // expected time to reach majority -> reward if no majority -- now without ! it's a reward for having majority
 endrewards
 
-label "x_wins"=((x+Cx>m)&(x+Cx>=y+Cy+d));
-label "y_wins"=((y+Cy>m)&(y+Cy>=x+Cx+d));
+label "x_wins"=((x+Cx>=m)&(x+Cx>=y+Cy+d));
+label "y_wins"=((y+Cy>=m)&(y+Cy>=x+Cx+d));

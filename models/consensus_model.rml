@@ -1,42 +1,31 @@
 ctmc
 
+            const int Zx = 40;
+            const int Zy = 40;
             const int N = 100;
-            const int cN = 6;
 
             module cross_inhibition
                 
-                x : [0..N] init 47;
-                y : [0..N] init 47;
-                u : [0..N] init 0;
-                Cx : [0..N] init 3;
-                Cy : [0..N] init 3;
+                x : [0..N] init 10;
+                y : [0..N] init 10;
                 
                 [cix] 	   (x>0) & (y>0) & (x<N)  -> x*y : (x'=x+1) & (y'=y-1);  // x+y -> x+x
                 [ciy] 	   (x>0) & (y>0) & (y<N)  -> x*y : (x'=x-1) & (y'=y+1);  // x+y -> y+y
-
-                [conxa]    (x>0) & (Cy>0) & (y<N) -> x*Cy : (x'=x-1) & (y'=y+1);		    // x+Cy -> y+Cy
-                [conxc]    (x>0) & (Cx>0) & (Cy<N) -> x*Cx : (Cx'=Cx-1) & (Cy'=Cy+1);	    // x+Cx -> x+Cy
-                [conya]    (y>0) & (Cx>0) & (x<N) -> y*Cx : (y'=y-1) & (x'=x+1);		    // y+Cx -> x+Cx
-                [conyc]    (y>0) & (Cy>0) & (Cx<N) -> y*Cy : (Cy'=Cy-1) & (Cx'=Cx+1);	    // y+Cy -> y+Cx
-                [conxx]    (Cx>1) & (Cy<(N-1)) -> (Cx*(Cx-1)/2) : (Cx'=Cx-2) & (Cy'=Cy+2); // Cx+Cx->Cy+Cy
-                [conyy]    (Cy>1) & (Cx<(N-1)) -> (Cy*(Cy-1)/2) : (Cy'=Cy-2) & (Cx'=Cx+2);	// Cy+Cy->Cx+Cx
+                [zeaxa]    (y>0) & (x<N) & (Zx>0) -> y*Zx : (y'=y-1) & (x'=x+1); // y+Zx -> x+Zx
+                [zeaya]    (x>0) & (y<N) & (Zy>0) -> x*Zy : (x'=x-1) & (y'=y+1); // x+Zy -> y+Zy
 
             endmodule
 
             // base rates
-            const double qx = 0.01; 
-            const double qy = 0.01; 
+            const double qx = 0.013999999999999999; 
+            const double qy = 0.006; 
 
             // module representing the base rates of reactions
             module base_rates
                 
                 [cix] true -> qx : true;
                 [ciy] true -> qy : true;
-                [conxa] true -> qy : true;
-                [conxc] true -> qx : true;
-                [conya] true -> qx : true;
-                [conyc] true -> qy : true;
-                [conxx] true -> qx : true;
-                [conyy] true -> qy : true;
+                [zeaxa] true -> qx : true;	
+                [zeaya] true -> qy : true;
 
             endmodule

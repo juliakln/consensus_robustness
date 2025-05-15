@@ -149,7 +149,7 @@ def write_model(stubborn, N, init):
 
 
 
-def write_ci_asym(stubborn, N, init):
+def write_ci_asym(stubborn, N, init, ratex, ratey):
     # compute remaining number of pure agents
     X = int(1/2 * (N - init))
     Z = int(1/2 * init)
@@ -179,8 +179,8 @@ def write_ci_asym(stubborn, N, init):
             endmodule
 
             // base rates
-            const double qx = """ + str(1.05/N) + """; 
-            const double qy = """ + str(0.95/N) + """; 
+            const double qx = """ + str(ratex/N) + """; 
+            const double qy = """ + str(ratey/N) + """; 
 
             // module representing the base rates of reactions
             module base_rates
@@ -226,8 +226,8 @@ def write_ci_asym(stubborn, N, init):
             endmodule
 
             // base rates
-            const double qx = """ + str(1.05/N) + """; 
-            const double qy = """ + str(0.95/N) + """; 
+            const double qx = """ + str(ratex/N) + """; 
+            const double qy = """ + str(ratey/N) + """; 
 
             // module representing the base rates of reactions
             module base_rates
@@ -431,7 +431,7 @@ def write_votermodel(stubborn, N, init):
 
 
 
-def write_votermodel_asym(stubborn, N, init):
+def write_votermodel_asym(stubborn, N, init, ratex, ratey):
     # compute remaining number of pure agents
     X = int(1/2 * (N - init))
     Z = int(1/2 * init)
@@ -456,8 +456,8 @@ def write_votermodel_asym(stubborn, N, init):
             endmodule
 
             // base rates
-            const double qx = """ + str(1.05/N) + """; 
-            const double qy = """ + str(0.95/N) + """; 
+            const double qx = """ + str(ratex/N) + """; 
+            const double qy = """ + str(ratey/N) + """; 
 
             // module representing the base rates of reactions
             module base_rates
@@ -496,8 +496,8 @@ def write_votermodel_asym(stubborn, N, init):
             endmodule
 
             // base rates
-            const double qx = """ + str(1.05/N) + """; 
-            const double qy = """ + str(0.95/N) + """; 
+            const double qx = """ + str(ratex/N) + """; 
+            const double qy = """ + str(ratey/N) + """; 
 
             // module representing the base rates of reactions
             module base_rates
@@ -648,7 +648,7 @@ def stableconsensus_voter(stubborn, N, majority, distance, transient, holding, r
 
     return probs
 
-def stableconsensus_voter_asym_x(stubborn, N, majority, distance, transient, holding, range, filename, samples):
+def stableconsensus_voter_asym_x(stubborn, N, majority, distance, transient, holding, range, filename, samples, ratex, ratey):
     dir_con = '../inference_results/' + filename + '_x_('+str(majority)+','+str(distance)+','+str(transient)+','+str(holding)+')'
     if not os.path.exists(dir_con):
         os.makedirs(dir_con)
@@ -657,7 +657,7 @@ def stableconsensus_voter_asym_x(stubborn, N, majority, distance, transient, hol
     for s in range:
         result = "./plasmares_" + str(int(s)) + ".txt"
         if not os.path.exists(result):
-            write_votermodel_asym(stubborn, N, int(s))
+            write_votermodel_asym(stubborn, N, int(s), ratex, ratey)
             write_property_stableconsensus_asym_x(N, stubborn, majority, distance, transient, holding)
             pcommand = "sh /Users/juliaklein/Documents/Sonstiges/plasmalab-1.4.5-SNAPSHOT/plasmacli.sh launch -m "+model+":rml -r "+property+":bltl  -a montecarlo -A\"Total samples\"="+str(samples)+" -f proba --progress -o " + result
             pprocess = subprocess.check_call(pcommand, stdin=None, stdout=None , stderr=None, shell=True)
@@ -668,7 +668,7 @@ def stableconsensus_voter_asym_x(stubborn, N, majority, distance, transient, hol
     return probs
 
 
-def stableconsensus_voter_asym_y(stubborn, N, majority, distance, transient, holding, range, filename, samples):
+def stableconsensus_voter_asym_y(stubborn, N, majority, distance, transient, holding, range, filename, samples, ratex, ratey):
     dir_con = '../inference_results/' + filename + '_y_('+str(majority)+','+str(distance)+','+str(transient)+','+str(holding)+')'
     if not os.path.exists(dir_con):
         os.makedirs(dir_con)
@@ -677,7 +677,7 @@ def stableconsensus_voter_asym_y(stubborn, N, majority, distance, transient, hol
     for s in range:
         result = "./plasmares_" + str(int(s)) + ".txt"
         if not os.path.exists(result):
-            write_votermodel_asym(stubborn, N, int(s))
+            write_votermodel_asym(stubborn, N, int(s), ratex, ratey)
             write_property_stableconsensus_asym_y(N, stubborn, majority, distance, transient, holding)
             pcommand = "sh /Users/juliaklein/Documents/Sonstiges/plasmalab-1.4.5-SNAPSHOT/plasmacli.sh launch -m "+model+":rml -r "+property+":bltl  -a montecarlo -A\"Total samples\"="+str(samples)+" -f proba --progress -o " + result
             pprocess = subprocess.check_call(pcommand, stdin=None, stdout=None , stderr=None, shell=True)
@@ -689,7 +689,7 @@ def stableconsensus_voter_asym_y(stubborn, N, majority, distance, transient, hol
 
 
 
-def stableconsensus_ci_asym_x(stubborn, N, majority, distance, transient, holding, range, filename, samples):
+def stableconsensus_ci_asym_x(stubborn, N, majority, distance, transient, holding, range, filename, samples, ratex, ratey):
     dir_con = '../inference_results/' + filename + '_x_('+str(majority)+','+str(distance)+','+str(transient)+','+str(holding)+')'
     if not os.path.exists(dir_con):
         os.makedirs(dir_con)
@@ -698,7 +698,7 @@ def stableconsensus_ci_asym_x(stubborn, N, majority, distance, transient, holdin
     for s in range:
         result = "./plasmares_" + str(int(s)) + ".txt"
         if not os.path.exists(result):
-            write_ci_asym(stubborn, N, int(s))
+            write_ci_asym(stubborn, N, int(s), ratex, ratey)
             write_property_stableconsensus_asym_x(N, stubborn, majority, distance, transient, holding)
             pcommand = "sh /Users/juliaklein/Documents/Sonstiges/plasmalab-1.4.5-SNAPSHOT/plasmacli.sh launch -m "+model+":rml -r "+property+":bltl  -a montecarlo -A\"Total samples\"="+str(samples)+" -f proba --progress -o " + result
             pprocess = subprocess.check_call(pcommand, stdin=None, stdout=None , stderr=None, shell=True)
@@ -709,7 +709,7 @@ def stableconsensus_ci_asym_x(stubborn, N, majority, distance, transient, holdin
     return probs
 
 
-def stableconsensus_ci_asym_y(stubborn, N, majority, distance, transient, holding, range, filename, samples):
+def stableconsensus_ci_asym_y(stubborn, N, majority, distance, transient, holding, range, filename, samples, ratex, ratey):
     dir_con = '../inference_results/' + filename + '_y_('+str(majority)+','+str(distance)+','+str(transient)+','+str(holding)+')'
     if not os.path.exists(dir_con):
         os.makedirs(dir_con)
@@ -718,7 +718,7 @@ def stableconsensus_ci_asym_y(stubborn, N, majority, distance, transient, holdin
     for s in range:
         result = "./plasmares_" + str(int(s)) + ".txt"
         if not os.path.exists(result):
-            write_ci_asym(stubborn, N, int(s))
+            write_ci_asym(stubborn, N, int(s), ratex, ratey)
             write_property_stableconsensus_asym_y(N, stubborn, majority, distance, transient, holding)
             pcommand = "sh /Users/juliaklein/Documents/Sonstiges/plasmalab-1.4.5-SNAPSHOT/plasmacli.sh launch -m "+model+":rml -r "+property+":bltl  -a montecarlo -A\"Total samples\"="+str(samples)+" -f proba --progress -o " + result
             pprocess = subprocess.check_call(pcommand, stdin=None, stdout=None , stderr=None, shell=True)
@@ -964,3 +964,29 @@ def read_data_2dim(dir = os.getcwd()):
     probs = dict(sorted(probabilities.items()))
 
     return probs
+
+
+"""
+Compute range of values for which the probability should be computed
+    input:
+        N: group size
+    output: 
+        array of evenly spaced values within a given interval
+
+"""
+def compute_range(N = 100):
+
+    # We compute the probabilities for maximum 70% of stubborn individuals
+    max_stubborn = int(N * 0.8)
+
+    # We want to have around 120 values of zealots for each group size, if possible
+    desired_count = 120 
+    step = 2
+    # Calculate the step size to try to get close to `desired_count` values
+    max_possible_values = (max_stubborn - 0) // step + 1
+    while max_possible_values > desired_count:
+        step += 2
+        max_possible_values = (max_stubborn - 0) // step + 1
+    
+    # Generate the even numbers within the range
+    return np.arange(2, max_stubborn + 1, step)

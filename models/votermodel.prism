@@ -1,27 +1,33 @@
 ctmc
 
-const int Zx;
-const int Zy;
-const int N;
+const int N = 100;
+const int Nhalf = 50;
+
+const int m=50;
+const int d=10;
+const int t=35;
+const int h=40;
+
+const int Zx = 6;
+const int Zy = 6;
+
+const double qx = 1.05/N;
+const double qy = 0.95/N;
 
 
 module voter
 	
-	x : [0..N] init 50;
-	y : [0..N] init 50;
+	x : [0..N] init Nhalf-Zx;
+	y : [0..N] init Nhalf-Zy;
 	
-	[cix] 	   (x>0) & (y>0) -> x*y : (x'=x+1) & (y'=y-1); // x+y -> x+x
-	[ciy] 	   (x>0) & (y>0) -> x*y : (x'=x-1) & (y'=y+1); // x+y -> y+y
+	[cix] 	   (x>0) & (y>0) & (x<N) -> x*y : (x'=x+1) & (y'=y-1); // x+y -> x+x
+	[ciy] 	   (x>0) & (y>0) & (y<N) -> x*y : (x'=x-1) & (y'=y+1); // x+y -> y+y
 
 	[zeaxa]    (y>0) & (x<N) & (Zx>0) -> y*Zx : (y'=y-1) & (x'=x+1);	// y+Zx -> x+Zx
 	[zeaya]    (x>0) & (y<N) & (Zy>0) -> x*Zy : (x'=x-1) & (y'=y+1);	// x+Zy -> y+Zy
 
 endmodule
 
-// base rates
-const double qx = 0.011; 
-const double qy = 0.009; 
-//const double noise = 0;
 
 // module representing the base rates of reactions
 module base_rates
@@ -33,3 +39,13 @@ module base_rates
 	[zeaya] true -> qy : true;
 
 endmodule
+
+
+rewards
+	//!(((y+Zy>=m)&(y>=x+d))) : 1; // expected time to reach majority -> reward if no majority 
+	(((x+Zx>=m)&(x>=y+d))) : 1; // expected time to reach majority -> reward if no majority 
+	//(((x+Zx>=m)&(x>=y+d)) | ((y+Zy>=m)&(y>=x+d))) : 1;
+endrewards
+
+label "x_wins"=((x+Zx>=m)&(x>=y+d));
+label "y_wins"=((y+Zy>=m)&(y>=x+d));

@@ -1,19 +1,19 @@
 ctmc
 
 // when volume changes, one should change all the parameters so to scale, including the percentage of zealots
-const int N = 1000;
-const int Nhalf = 500;
+const int N = 100;
+const int Nhalf = 50;
 
-const int m=500;
-const int d=100;
+const int m=50;
+const int d=10;
 const int t=35;
 const int h=40;
 
-const int Zx = 140;
-const int Zy = 140;
+const int Zx = 1;
+const int Zy = 1;
 
-const double qx = 1/N;
-const double qy = 1/N;
+const double qx = 1/N; //1.05
+const double qy = 1/N; //0.95
 
 module cross_inhibition
 	x : [0..N] init Nhalf-Zx;
@@ -25,10 +25,10 @@ module cross_inhibition
 	[rx] 	   (x>0) & (x<N) & (u>0) -> x*u : (x'=x+1) & (u'=u-1);  	// u+x -> 2x 
 	[ry]       (y>0) & (y<N) & (u>0) -> y*u : (y'=y+1) & (u'=u-1);		// u+y -> 2y
 
-	[zeaxa]    (y>0) & (u<N)	 -> y*Zx : (y'=y-1) & (u'=u+1);		// y+Zx -> u+Zx
-	[zeaxb]    (u>0) & (x<N)	 -> u*Zx : (x'=x+1) & (u'=u-1);		// u+Zx -> x+Zx
-	[zeaya]    (x>0) & (u<N)	 -> x*Zy : (x'=x-1) & (u'=u+1);		// x+Zy -> u+Zy
-	[zeayb]    (u>0) & (y<N)	 -> u*Zy : (y'=y+1) & (u'=u-1);		// u+Zy -> y+Zy
+	[zeaxa]    (y>0) & (u<N) & (Zx>0) -> y*Zx : (y'=y-1) & (u'=u+1);		// y+Zx -> u+Zx
+	[zeaxb]    (u>0) & (x<N) & (Zx>0) -> u*Zx : (x'=x+1) & (u'=u-1);		// u+Zx -> x+Zx
+	[zeaya]    (x>0) & (u<N) & (Zy>0) -> x*Zy : (x'=x-1) & (u'=u+1);		// x+Zy -> u+Zy
+	[zeayb]    (u>0) & (y<N) & (Zy>0) -> u*Zy : (y'=y+1) & (u'=u-1);		// u+Zy -> y+Zy
 
 endmodule
 
@@ -47,11 +47,11 @@ module base_rates
 
 endmodule
 
-rewards
-//      (x+Zx>=m)&(x>=y+d): 1;//count time only if in xwinning states
-//	!((x+Zx>=m)&(x>=y+d)): 1;
-	(((x+Zx>=m)&(x>=y+d)) | ((y+Zy>=m)&(y>=x+d))) : 1; // expected time to reach majority -> reward if no majority 
+rewards	
+//	((x+Zx>=m)&(x>=y+d)) : 1; // expected time to reach majority -> reward if no majority 
+//	!((y+Zy>=m)&(y>=x+d)) : 1; // expected time to reach majority -> reward if no majority 
+	!(((x+Zx>=m)&(x>=y+d)) | ((y+Zy>=m)&(y>=x+d))) : 1;
 endrewards
 
-label "x_wins"=((x+Zx>m)&(x>=y+d));
-label "y_wins"=((y+Zy>m)&(y>=x+d));
+label "x_wins"=((x+Zx>=m)&(x>=y+d));
+label "y_wins"=((y+Zy>=m)&(y>=x+d));
