@@ -20,7 +20,11 @@ Julia Klein, Alberto d’Onofrio, and Tatjana Petrov
 ### data/
 Datasets for experiments and simulations  
 ./histograms/  
-Distribution of x over different time steps for symmetric and asymmetric model
+Distribution of x over different time steps for symmetric and asymmetric model  
+./times/
+Expected times analyses with PRISM  
+./rateofchange/  
+Rate of change of X depending on the amount of X in the system  
 
 ### figures/
 Figures and plots generated from experiments
