@@ -18,7 +18,9 @@ Julia Klein, Alberto d’Onofrio, and Tatjana Petrov
 ## Repository structure
 
 ### data/
-Datasets for experiments and simulations
+Datasets for experiments and simulations  
+./histograms/  
+Distribution of x over different time steps for symmetric and asymmetric model
 
 ### figures/
 Figures and plots generated from experiments
